@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+ 	
+		<record id="edit_holiday_new1" model="ir.ui.view">
+            <field name="name">Leave Request</field>
+            <field name="model">calender.test</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <form string="Leave Request" version="7.0">
+                
+                <sheet string="Leave Request">
+                    <group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="employee_id"/>
+                         </group>
+                       
+                    </group>
+                </sheet>
+                </form>
+            </field>
+        </record>
+		
+		
+		
+		
+		
+		
+		<record id="view_holiday_new_calendar1" model="ir.ui.view">
+            <field name="name">Calender Test</field>
+            <field name="model">calender.test</field>
+            <field name="arch" type="xml">
+                <calendar string="Leave Request" color="employee_id" date_start="date_from" date_stop="date_to">
+                    <field name="employee_id"/>
+                </calendar>
+            </field>
+        </record>
+		<record model="ir.actions.act_window" id="open_ask_holidays1">
+            <field name="name">Leave Requests</field>
+            <field name="res_model">calender.test</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="edit_holiday_new1"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create a new leave request.
+              </p><p>
+                Once you have recorded your leave request, it will be sent
+                to a manager for validation. Be sure to set the right leave
+                type (recuperation, legal holidays, sickness) and the exact
+                number of open days related to your leave.
+              </p>
+            </field>
+        </record>
+		
+		<record model="ir.actions.act_window.view" id="action_open_ask_holidays_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="edit_holiday_new1"/>
+            <field name="act_window_id" ref="open_ask_holidays1"/>
+        </record>
+		
+		
+		
+		
+		<record model="ir.actions.act_window.view" id="action_open_ask_holidays_calendar">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">calendar</field>
+            <field name="view_id" ref="view_holiday_new_calendar1"/>
+            <field name="act_window_id" ref="open_ask_holidays1"/>
+        </record>
+
+        <menuitem parent="sws_sub_head" id="menu_open_ask_holidays_new1" action="open_ask_holidays1"/>
+		
+    </data>
+</openerp>

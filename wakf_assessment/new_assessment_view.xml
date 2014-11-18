@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+    	<record model="ir.ui.view" id="assessment1_window_tree_view">
+                <field name="name">assessment.window.tree</field>
+                <field name="model">assessment.window</field>
+                <field name="type">tree</field>
+                <field name="arch" type="xml">
+                    <tree string="Assessment Tree" version="7.0" colors="red:state in ('re-assess','appeal');blue:state in ('submitted','invoiced');black:state in ('RR','showcause');green:state == 'sent_notice'">
+                        <field name="name"/>
+                        <field name="wakf_id"/>
+                        <field name="district"/>
+                        <field name="assess_year"/>
+                        <field name="acc_year"/>
+                        <field name="date_from"/>
+                        <field name="revised"/>
+                        <field name="state"/>
+                        
+                    </tree>
+                </field>
+            </record>
+
+            <record model="ir.ui.view" id="assessment1_window_form_view">
+                <field name="name">assessment.window.form</field>
+                <field name="model">assessment.window</field>
+                <field name="type">form</field>
+                <field name="arch" type="xml">
+                
+                    <form string="Assessment Form" version="7.0" >
+                    <header>
+                    	<button name="action_submit" string="Submit" type="object" groups="wakf_assessment.group_assessment_submit" attrs="{'invisible':['|',('state','in',('submitted','sent_notice','invoiced','showcause','RR','appeal','re-assess','completed'))]}"/>
+                    	<button name="action_sent_notice" string="Sent Notice" type="object" groups="wakf_assessment.group_assessment_invoice" icon="gtk-go-forward" attrs="{'invisible':[('state','!=','submitted')]}"/>
+                		<button name="action_invoice" string="Invoice" type="object" groups="wakf_assessment.group_assessment_invoice" icon="gtk-goto-last" attrs="{'invisible':[('state','not in',('sent_notice'))]}"/>
+                		<button name="action_showcause" string="Sent ShowCause" type="object" groups="wakf_assessment.group_assessment_showcause" icon="gtk-goto-last" attrs="{'invisible':[('state','!=','invoiced')]}"/>
+                		<button name="action_appeal" string="Review Request" type="object" groups="wakf_assessment.group_assessment_appeal_reassess" icon="gtk-goto-last" attrs="{'invisible':[('state','not in',('invoiced','showcause'))]}"/>
+                		<button name="action_RR" string="Send RR" type="object" groups="wakf_assessment.group_assessment_RR" icon="gtk-goto-last" attrs="{'invisible':[('state','not in',('showcause','appeal','invoiced'))]}"/>
+                		<button name="action_re_assess" string="Re-assessment" type="object" groups="wakf_assessment.group_assessment_appeal_reassess" icon="gtk-goto-last" attrs="{'invisible':[('state','!=','appeal')]}"/>
+                		<field name="state" widget="statusbar" statusbar_visible="submitted,sent_notice,invoiced,showcause,RR,appeal,re-assess,completed"
+                		/>
+                		
+                    </header>
+                    <sheet>
+                    	<group>
+                        <div class="oe_title">
+                            
+                            <div class="oe_edit_only">
+                                <label for="name" string="Registration Number"/>
+                                
+                            </div>
+                            <h1>
+                           
+                                <field name="name" on_change="on_change_wakf_regno_to_name_new_assess(name,acc_year)"/>
+                      
+                            </h1>
+                            
+                            
+                        </div>
+                         
+                        <div class="oe_title">
+                       
+                            <div class="oe_edit_only">
+                                <label for="name" string="Account Year"/>
+                            </div>
+                            <h1>
+                                <field name="acc_year" on_change="on_change_acc_year_to_munbaki(name,acc_year)"/>
+                            </h1>
+                          
+                        </div>
+                        </group>  
+                   		<group>
+                         <group>
+                         	<field name="revised"/>
+                         	<field name="appeal_no" attrs="{'invisible':[('revised','!=',True)],'readonly':[('state','in',['submitted','sent_notice','invoiced','showcause','RR','appeal','re-assess','completed'])],'required':[('state','in',['submitted']),('revised','=',True)]}"/>
+                         	<field name="appeal_details" attrs="{'invisible':[('revised','!=',True)],'readonly':[('state','in',['submitted','sent_notice','invoiced','showcause','RR','appeal','re-assess','completed'])],'required':[('state','in',['submitted']),('revised','=',True)]}"/>
+                         	<field name="appeal_date" attrs="{'invisible':[('revised','!=',True)],'readonly':[('state','in',['submitted','sent_notice','invoiced','showcause','RR','appeal','re-assess','completed'])],'required':[('state','in',['submitted']),('revised','=',True)]}"/>
+                        	<field name="wakf_id"/>
+                        	<field name="district"/>
+                        	<field name="taluk" string="Taluk"/>
+                        	<field name="village" string="Village"/>
+                         </group>
+                         <group>
+                        	<field name="date_from"/>
+                        	<field name="assess_year"/>	
+                         </group>
+                         
+                         <group string="Kaivasam">
+                        	<field name="line_1"/>
+                        	<field name="line_2"/>
+                        	<field name="line_3"/>
+                         </group>
+                         <group string="Summary" attrs="{'invisible':[('state','not in',['submitted','sent_notice','invoiced','showcause','RR','appeal','re-assess','completed','done'])]}">
+                         	<field name="grand_income"/>
+                        	<field name="exempted"/>
+                        	<field name="munbaki"/>
+                        	<field name="deducted"/>
+                        	<field name="net_income" class="oe_subtotal_footer_separator" widget="monetary"/>
+                        	<field name="contribution_amount"/>
+                         
+                         </group>
+                 
+                        </group>
+                        <notebook colspan="4">
+                        <page string="Income Details" attrs="{'invisible':['|',('state','in',('submitted','sent_notice','invoiced','showcause','RR','appeal','re-assess','completed','done'))]}">
+                        	<field name="assess_line_id1" nolabel="1" widget="one2many_list">
+							 	 <tree string="Income Lines" editable="bottom">
+									<field name="statement_a"/>		
+									<field name="unit_cost" on_change="on_change_property_percentage(statement_a,unit_cost)"/>
+									<field name="exmpt_percentage"/>
+									<field name="exmpt_amount"/>
+									<field name="amount_total"/>
+									<field name="state" invisible="1"/>
+								</tree>		
+								
+			
+							</field> 
+							<group>
+							<field name="kaivasam"/>
+							<field name="bank"/>
+							<field name="dhanyam"/>
+					       	</group> 
+					                               
+                        </page>
+    <!-- ==================================  COPY INCOME ========================================= -->
+    					<page string="IncomeDetails" attrs="{'invisible':[('state','not in',['submitted','sent_notice','invoiced','showcause','RR','appeal','re-assess','completed','done'])],'readonly':[('state','in',['submitted','sent_notice','invoiced','showcause','RR','appeal','re-assess','completed','done'])]}">
+                        	<field name="assess_line_id1_copy" nolabel="1" widget="one2many_list">
+							 	 <tree string="Income Line" editable="bottom">
+									<field name="statement_a"/>									
+									<field name="unit_cost"/>
+									<field name="exmpt_percentage"/>
+									<field name="exmpt_amount"/>
+									<field name="amount_total"/>
+									
+								</tree>		
+							</field>
+							<group></group>
+							<group class="oe_subtotal_footer oe_right">							 
+					  			<field name="amount_total1" class="oe_subtotal_footer_separator" widget="monetary"/>
+					        </group>
+					        <group>
+							<field name="kaivasam"/>
+							<field name="bank"/>
+							<field name="dhanyam"/>
+					       	</group> 
+					                                
+                        </page>
+    <!-- =================================  COPY INCOME CLOSE ============================================= -->
+                        
+                        
+                        <page string="Expense Details" attrs="{'invisible':['|',('state','in',('submitted','sent_notice','invoiced','showcause','RR','appeal','re-assess','completed','done'))]}">
+                        	<field name="assess_line_id2" nolabel="1" widget="one2many_list" >
+                        		 <tree string="Expense Lines" editable="bottom" colspan="4">	
+									<field name="statement_b" on_change="on_change_property_percentage(statement_b,unit_cost)"/>								
+									<field name="unit_cost" on_change="on_change_property_percentage(statement_b,unit_cost)"/>
+									<field name="state" invisible="1"/>
+									<field name="ded_percentage" />
+									<field name="ded_amount" />
+									<field name="amount_total"/>
+									<field name="related"/>
+								</tree>	
+							</field>
+							<group>
+					       	</group>
+					       	<group class="oe_subtotal_footer oe_right">
+							 
+								<field name="amount_total2" class="oe_subtotal_footer_separator" widget="monetary"/>
+					        </group>
+			
+					       	<group>
+					       	</group>
+								
+                        </page>
+  <!--  ========================================== COPY EXPENSE START ======================================== -->
+  						<page string="ExpenseDetails" attrs="{'invisible':['|',('state','not in',('submitted','sent_notice','invoiced','showcause','RR','appeal','re-assess','completed','done'))]}">
+                        	<field name="assess_line_id2_copy" nolabel="1" widget="one2many_list" >
+                        		 <tree string="ExpenseLines" editable="bottom" colspan="4">	
+									<field name="statement_b"/>								
+									<field name="unit_cost"/>
+									<field name="ded_percentage" />
+									<field name="ded_amount" />
+									<field name="amount_total"/>
+									<field name="related"/>
+								</tree>	
+							</field>
+							<group>
+					       	</group>
+					       	<group class="oe_subtotal_footer oe_right">
+							 
+								<field name="amount_total2" class="oe_subtotal_footer_separator" widget="monetary"/>
+					        </group>
+						 </page>
+  <!--  =========================================== COPY EXPENSE START ======================================== -->
+                        <page string="Follow Ups" attrs="{'invisible':['|',('state','not in',('submitted','sent_notice','invoiced','showcause','RR','appeal','re-assess','completed','done'))]}">
+                        		<field name="follow_up_id" nolabel="1" widget="one2many_list">
+							 	 	<tree string="Follow Ups.." editable="bottom">
+							 	 		<field name="name"/>
+										<field name="who"/>
+										<field name="when"/>
+									</tree>
+								</field>							        	
+						</page>
+                        
+                        </notebook>
+               
+                       
+                    </sheet>
+                    <div class="oe_chatter">
+	                	<field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+	                	<field name="message_ids" widget="mail_thread" placeholder="Share a message..."/>
+	            		</div> 
+                    </form>
+                 
+                </field>
+            </record>
+            
+          
+      
+            <!--  
+       			<report auto="False" id="report_id" model="model_name" 
+                name="report_name" rml="path/to/reportfile"
+                string="My Report"/>   -->
+     		
+
+            
+
+
+            <record model="ir.actions.act_window" id="action_assessment1_window_tree_view">
+                <field name="name">Assessment Details</field>
+                <field name="type">ir.actions.act_window</field>
+                <field name="res_model">assessment.window</field>
+		   <!-- <field name="domain">[('field_name','condition',criteria)]</field>-->
+                <field name="view_type">form</field>
+                <field name="view_mode">tree,form</field>
+                <field name="view_id" ref="assessment1_window_tree_view"/>
+            </record>
+            
+            <record id="assessmen_window_search_view" model="ir.ui.view">
+            <field name="name">Assessment Window</field>
+            <field name="model">assessment.window</field>
+            <field name="arch" type="xml">
+                <search string="Search">
+                <field name="name" string="Register Number" filter_domain="[(('name','=',self))]"/>
+                <separator/>
+                <filter string="Submitted" name="open" domain="[('state','=','submitted')]" help="Open"/>
+                <filter string="Notice Send" name="open" domain="[('state','=','sent_notice')]" help="Open"/>
+                <filter string="Invoiced" name="open" domain="[('state','=','invoiced')]" help="Open"/>
+                <filter string="Showcause Send" name="open" domain="[('state','=','showcause')]" help="Open"/>
+                <filter string="RR Issued" name="open" domain="[('state','=','RR')]" help="Open"/>
+                <filter string="Appealed" name="open" domain="[('state','=','appeal')]" help="Open"/>
+                <filter string="Re-Assessment sanctioned" name="open" domain="[('state','=','re-assess')]" help="Open"/>
+                <filter string="Cancelled" name="open" domain="[('state','=','completed')]" help="Open"/>
+                
+                 <group expand="0" string="Group By...">
+              		<filter string="Register Number" domain="[]" context="{'group_by':'name'}"/>
+              		<filter string="Account Year" domain="[]" context="{'group_by':'acc_year'}"/>
+              		<filter string="Assessment Year" domain="[]" context="{'group_by':'assess_year'}"/>
+              		<filter string="Assess Date" domain="[]" context="{'group_by':'date_from'}"/>
+              		<filter string="District" domain="[]" context="{'group_by':'district'}"/>
+              		<filter string="State of Assessment" icon="terp-partner" domain="[]" context="{'group_by':'state'}"/>
+                 </group>
+  				 </search>
+            </field>
+        </record>
+
+		   	<!-- <menuitem id="assessment1_window_menu" name="assessment_window" parent="account.next_id_27" action="action_assessment1_window_tree_view"/>--> 
+           <menuitem id="assessment1_window_menu" name="Assessment Details" parent="account.menu_finance" sequence="1" />
+           <!-- ====================changing main menu & sub menus in accounting========== -->
+           <menuitem name="Accounting" id="account.menu_finance" groups="account.group_account_user,account.group_account_manager,account.group_account_invoice" sequence="50"/>
+		   <menuitem id="account.menu_finance_receivables" name="Wakf Transactions" parent="account.menu_finance" sequence="2"/>
+         <!-- =============================================================================================================== -->  
+         <!-- =============================================================================================================== -->  
+			<!--============== Invoice receipts inherit form starts (acc.voucher)=========================== -->
+            <record id="invoice_customer_invoice_form_1" model="ir.ui.view">
+  			<field name="name">view.account.invoicee.receipts.inherited</field>
+  			<field name="model">account.voucher</field>
+  			<field name="inherit_id" ref="account_voucher.view_sale_receipt_form" />
+  			<field name="arch" type="xml">
+  				<xpath expr="//form/sheet/group/group[1]/field[@name='partner_id']" position="replace">
+  					<field name="partner_id" domain="[('customer','=',True)]" on_change="onchange_partner_id(partner_id, journal_id, amount, currency_id, type, date, context)" string="Wakf Name" context="{'search_default_customer':1, 'show_address': 1}" options="{&quot;always_reload&quot;: True}"/>
+  				</xpath>
+  			</field>
+  			</record>
+           <!--============== Invoice receipts inherit form ends=========================== --> 
+	    		<!--============== Invoice receipts inherit tree starts (acc.voucher)===========================--> 
+	    		
+    		<record id="invoice_customer_invoice_form_2" model="ir.ui.view">
+  			<field name="name">view.account.invoicee.receipts.tree.inherited</field>
+  			<field name="model">account.voucher</field>
+  			<field name="inherit_id" ref="account_voucher.view_voucher_tree" />
+  			<field name="arch" type="xml">
+  				<xpath expr="//tree/field[@name='partner_id']" position="replace">
+  					<field name="partner_id" string="Wakf Name"/>
+  				</xpath>
+  			</field>
+  			</record>
+    		<!--============== Invoice receipts inherit tree ends=========================== --> 
+    		
+    		<!--============== Invoice payments inherit form starts (acc.voucher)=========================== 
+            <record id="invoice_customer_invoice_form_3" model="ir.ui.view">
+  			<field name="name">view.account.invoicee.payments.inherited</field>
+  			<field name="model">account.voucher</field>
+  			<field name="inherit_id" ref="account_voucher.view_vendor_receipt_form" />
+  			<field name="arch" type="xml">
+  				<xpath expr="//form/sheet/group/group[1]/field[@name='partner_id']" position="replace">
+                    <field name="partner_id" domain="[('customer','=',True)]" required="1" on_change="onchange_partner_id(partner_id, journal_id, amount, currency_id, type, date, context)" string="Wakf Name" context="{'search_default_customer': 1}"/>  				</xpath>
+  			</field>
+  			</record>-->
+           <!--============== Invoice payments inherit form ends=========================== --> 
+           
+           <!--============== Invoice payments filter starts (acc.voucher)=========================== 
+            <record id="invoice_customer_invoice_filter" model="ir.ui.view">
+  			<field name="name">view.account.invoicee.filter1.inherited</field>
+  			<field name="model">account.voucher</field>
+  			<field name="inherit_id" ref="account_voucher.view_voucher_filter_customer_pay" />
+  			<field name="arch" type="xml">
+  				<xpath expr="//filter[@string='Customer']" position="replace">
+                    <filter string="Wakf Name" icon="terp-personal" domain="[]" context="{'group_by':'partner_id'}"/>
+  				</xpath>
+  			</field>
+  			</record>-->
+           <!--============== Invoice payments inherit filter ends=========================== --> 
+           <!--============== Invoice payments filter vendor pay starts (acc.voucher)=========================== 
+            <record id="invoice_customer_invoice_filter_2" model="ir.ui.view">
+  			<field name="name">view.account.invoicee.filter2.inherited</field>
+  			<field name="model">account.voucher</field>
+  			<field name="inherit_id" ref="account_voucher.view_voucher_filter_sale" />
+  			<field name="arch" type="xml">
+  				<xpath expr="//filter[@string='Customer']" position="replace">
+                    <filter string="Customer" icon="terp-personal" domain="[]" context="{'group_by':'partner_id'}"/>
+  				</xpath>
+  			</field>
+  			</record>-->
+           <!--============== Invoice payments inherit filter vendor pay ends=========================== --> 
+           <!--============== Invoice payments filter vendor pay starts (acc.voucher)=========================== 
+            <record id="invoice_account_invoice_filter_1" model="ir.ui.view">
+  			<field name="name">view.account.invoicee.filter11.inherited</field>
+  			<field name="model">account.invoice</field>
+  			<field name="inherit_id" ref="account_report_company.account_report_company_search_view" />
+  			<field name="arch" type="xml">
+  				<xpath expr="//filter[@name='commercial_partner_id']" position="replace">
+                    <filter name="commercial_partner_id" string="Wakf Name" domain="[]" context="{'group_by':'commercial_partner_id'}"/>
+  				</xpath>
+  			</field>
+  			</record>-->
+           <!--============== Invoice payments inherit filter vendor pay ends=========================== --> 
+           <!--============== Invoice payments filter report vendor2 pay starts (acc.voucher)===========================
+            <record id="invoice_account_invoice_report_filter_1" model="ir.ui.view">
+  			<field name="name">view.account.invoicee.filter12.inherited</field>
+  			<field name="model">account.invoice.report</field>
+  			<field name="inherit_id" ref="account_report_company.account_report_company_invoice_report_search_view" />
+  			<field name="arch" type="xml">
+  				<xpath expr="//filter[@string='Partner']" position="replace">
+                    <filter string="Wakf Name" name="commercial_partner_id" context="{'group_by':'commercial_partner_id','residual_visible':True}"/>
+  				</xpath>
+  			</field>
+  			</record>-->
+           <!--============== Invoice payments inherit report filter vendor2 pay ends=========================== --> 
+           
+           <!--============== Invoice filter report vendor2 pay starts (acc.voucher)=========================== 
+            <record id="invoice_account_invoice_report_filter_3" model="ir.ui.view">
+  			<field name="name">view.account.invoicee.filter13.inherited</field>
+  			<field name="model">account.invoice.report</field>
+  			<field name="inherit_id" ref="account.view_account_invoice_report_search" />
+  			<field name="arch" type="xml">
+  				<xpath expr="//filter[@icon='terp-personal']" position="replace">
+                     <filter icon="terp-personal" string="Wakf Name" name="customer" domain="['|', ('type','=','out_invoice'),('type','=','out_refund')]" help="Wakf Invoices And Refunds"/>
+  				</xpath>
+  				<xpath expr="//filter[@string='Supplier']" position="replace"/>
+  			 	<xpath expr="//filter[@string='Partner']" position="replace">
+                     <filter string="Partner" name="partner" icon="terp-partner" context="{'group_by':'partner_id','residual_visible':True}"/>
+  				</xpath>
+  				<xpath expr="//filter[@string='Salesperson']" position="replace">
+                     <filter string="Assessemnt Officer" name="user" icon="terp-personal" context="{'group_by':'user_id'}"/>
+  				</xpath>
+  				<xpath expr="//filter[@string='Product']" position="replace">
+                      <filter string="Assessment Property" icon="terp-accessories-archiver" context="{'group_by':'product_id','set_visible':True,'residual_invisible':True}"/>
+  				</xpath>
+  				<xpath expr="//filter[@string='Category of Product']" position="replace"/>
+  			</field>
+  			</record>-->
+           <!--============== Invoice filter inherit report filter vendor2 pay ends=========================== -->
+			
+			<!-- =============================== Account Voucher Inherit ========================= 
+  			
+  			<record id="invoice_voucher_invoice_form" model="ir.ui.view">
+		  			<field name="name">view.account.voucher23.inherited</field>
+		  			<field name="model">account.voucher</field>
+		  			<field name="inherit_id" ref="account_voucher.view_vendor_receipt_form" />
+		  			<field name="arch" type="xml">
+		  				  <xpath expr="//form/sheet/group/group[1]/field[@name='partner_id']" position="before">
+		  				  		<field name="registration_no" on_change="on_change_wakf_regno_to_name(registration_no)"/>
+		  				  </xpath>
+		  			</field>
+		  	</record>-->
+		  	
+		  	<!-- ========================  Invoice filter to reg no default search ============== -->
+			 
+			<record id="view_invoice_default_inherited_2" model="ir.ui.view">
+  			<field name="name">view.account.invoice.default.inherited</field>
+  			<field name="model">account.invoice</field>
+  			<field name="inherit_id" ref="account.view_account_invoice_filter" />
+  			<field name="arch" type="xml">	
+  				<xpath expr="//search[@string='Search Invoice']/field[@name='number']" position="replace">
+  					<field name="registration_no" string="Register Number" filter_domain="[(('registration_no','=',self))]"/>
+  					<field name="appli_no" string="Application Number" filter_domain="[(('appli_no','=',self))]"/>
+  					<field name="assess_year_saleorder" string="Account Year" filter_domain="[(('assess_year_saleorder','=',self))]"/>
+		  			<field name="account_year_saleorder" string="Assessment Year" filter_domain="[(('account_year_saleorder','=',self))]"/>
+  				</xpath>
+  				<xpath expr="//search[@string='Search Invoice']/group[@string='Group By']" position="inside">
+  					<filter string="Account Year" icon="terp-partner" domain="[]" context="{'group_by':'assess_year_saleorder'}"/>
+  					<filter string="Assessment Year" icon="terp-partner" domain="[]" context="{'group_by':'account_year_saleorder'}"/>
+  					<filter string="Assessment Type" icon="terp-partner" domain="[]" context="{'group_by':'assessment_type'}"/>
+  					<filter string="Invoice Date" icon="terp-partner" domain="[]" context="{'group_by':'date_invoice'}"/>
+  					<filter string="Account" icon="terp-partner" domain="[]" context="{'group_by':'account_id'}"/>
+  					<filter string="State of Assessment" icon="terp-partner" domain="[]" context="{'group_by':'state'}"/>
+  				</xpath>
+  			</field>
+  			</record>
+  			
+  			
+
+
+    </data>
+</openerp>

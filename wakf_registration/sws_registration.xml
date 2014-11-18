@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+    	 <!-- ===================================  POP UP CANCEL XML ==================================== -->
+    	 <!-- =========================================================================================== -->     
+    	    
+            <record model="ir.ui.view" id="pop_up_cancel_tree_view">
+                <field name="name">pop.up.cancel.tree</field>
+                <field name="model">pop.up.cancel</field>
+                <field name="type">tree</field>
+                <field name="arch" type="xml">
+                    <tree string="POPUP">
+                       <field name="name"/>
+                    </tree>
+                </field>
+            </record>
+
+            <record model="ir.ui.view" id="pop_up_cancel_form_view">
+                <field name="name">pop.up.cancel.form</field>
+                <field name="model">pop.up.cancel</field>
+                <field name="type">form</field>
+                <field name="arch" type="xml">
+                    <form string="POPUP" version="7.0">      
+                        <field name="over_income"/>
+                        <field name="grant_sanctioned"/>
+                        <field name="after_marriage"/>
+                        <field name="age_not_specified"/>
+                        <field name="under_age"/>
+                        <field name="exp_not_spcfed"/>
+                        <field name="under_experience"/>
+                        <field name="job_income_not"/>
+                        <field name="no_reason"/>
+                        <field name="no_annual_income"/>
+                        <field name="mahal_not_regd"/>
+                        <field name="undefined_ctgry"/>
+                        <field name="certificate_not"/>
+                        <field name="institue_not"/>
+                    </form>
+                </field>
+            </record>
+
+            <record model="ir.actions.act_window" id="action_pop_up_cancel_tree_view">
+                <field name="name">pop.up.cancel</field>
+                <field name="type">ir.actions.act_window</field>
+                <field name="res_model">pop.up.cancel</field>
+		   <!-- <field name="domain">[('field_name','condition',criteria)]</field>-->
+                <field name="view_type">form</field>
+                <field name="view_mode">tree,form</field>
+                <field name="view_id" ref="pop_up_cancel_tree_view"/>
+            </record>
+         <!-- ============================================================================================== -->
+         <!-- ========================================  PENSION CYCLE VIEW ================================= -->
+         <!-- =============================================================================================== -->
+         <record model="ir.ui.view" id="pensioncycle_tree_view">
+                <field name="name">pensioncycle.tree</field>
+                <field name="model">pension.cycle</field>
+                <field name="type">tree</field>
+                <field name="arch" type="xml">
+                    <tree string="tree_string" version="7.0">
+                        <field name="date_today"/>
+                        <field name="date_upto"/>
+                        <field name="maximum_amount"/>
+                        <field name="actual_amount"/>
+                    </tree>
+                </field>
+            </record>
+
+            <record model="ir.ui.view" id="pensioncycle_form_view">
+                <field name="name">Pension Cycle</field>
+                <field name="model">pension.cycle</field>
+                <field name="type">form</field>
+                <field name="arch" type="xml">
+                    <form string="form_string" version="7.0">
+                    	<sheet>
+                    		<group>
+                    			<group>
+                    				<field name="date_today" select="1"/>
+                    				<field name="date_upto"/>
+                    				<button name="fetch_pending_pensions" string="fetch" type="object" icon="gtk-goto-last"/>
+                    			</group>
+                    			<group>
+                    				<field name="maximum_amount"/>
+                        			<field name="actual_amount"/>
+                        			<field name="balance_amount"/>
+                        			<button name="button_update" string="Update" type="object" icon="gtk-go-forward"/>
+                        			<button name="button_allocate" string="Allocate" type="object" icon="gtk-goto-last"/>
+                        			
+                    			</group>
+                    		</group>
+                    		<notebook colspan="4">
+                        	<page string="Pension Cycle">
+                        		<field name="pension_line_id" nolabel="1" widget="one2many_list">
+							 	 	<tree string="Pension Cycle Line" editable="bottom">
+							 	 		<field name="application_no"/>
+							 	 		<field name="name_appli"/>
+							 	 		<field name="date_reference"/>
+							 	 		<field name="date_year"/>
+                        				<field name="date_month"/>
+                        				<field name="sanctioned_amount" sum="Total Amount"/>
+                        				<field name="status"/>
+                        				<field name="full_reconcile"/>
+                        			</tree>
+                        		</field>
+                        	</page>
+                        	</notebook>
+                    	</sheet>
+                    </form>
+                </field>
+            </record>
+
+            <record model="ir.actions.act_window" id="action_pensioncycle_tree_view">
+                <field name="name">Pension Cycle</field>
+                <field name="type">ir.actions.act_window</field>
+                <field name="res_model">pension.cycle</field>
+		   <!-- <field name="domain">[('field_name','condition',criteria)]</field>-->
+                <field name="view_type">form</field>
+                <field name="view_mode">tree,form</field>
+                <field name="view_id" ref="pensioncycle_form_view"/>
+            </record>
+
+			
+         
+            
+         <!-- ====================================== SUPPLIER VIEW INHERIT FOR SWS ========================= -->
+         <!-- ============================================================================================== -->   
+          <record id="action_partner_supplier_form_demo" model="ir.actions.act_window">
+			<field name="name">Applicants</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">res.partner</field>
+			<field name="priority" eval="16"/>
+			<field name="view_type">form</field>
+			<field name="domain">[]</field>
+			<field name="auto_refresh">10</field>
+			<field name="view_mode">kanban,tree,form</field>
+			<field name="context">{'search_default_supplier': 1,'default_customer': 0,'default_supplier': 1,'default_is_wakf': 0}
+			</field>
+			<field name="filter" eval="True"/>
+			<field name="help" type="html">
+			<p class="oe_view_nocontent_create">Click to add a contact in your address book.</p>
+			<p>
+			OpenERP helps you easily track all activities related to a supplier: discussions, history of purchases, documents, etc.
+			</p>
+			</field>
+		</record>
+		
+		
+		<!-- ====================================== SWS Action Menus ======================================= -->		
+			<menuitem id="sws_main_menu" name="SWS" parent="" groups="wakf_registration.group_sws_submit"/>	
+		
+	
+		<!-- ======================================  Sub Menus ======================================= -->		
+			<menuitem id="sws_sub_head" name="SWS Registration" parent="sws_main_menu"/>
+			<menuitem id="sws_sub_criteria" name="SWS Criteria" parent="sws_main_menu"/>
+			<menuitem id="sws_sub_scholarship" name="Scholarship Criteria" parent="sws_main_menu"/>
+			
+		<!-- ====================================== Registration Action Menus ======================================= -->		
+			<menuitem id="registration_main_menu" name="Waqf Registration" parent="" groups="wakf_registration.group_wakf_registration"/>	
+		
+	
+		<!-- ======================================  Registration Sub Menus ======================================= -->		
+			<menuitem id="registration_form" name="Registration" parent="registration_main_menu"/>
+			<menuitem id="registration_location" name="Location" parent="registration_main_menu"/>
+			<menuitem id="registration_other" name="Others" parent="registration_main_menu"/>	
+			
+				
+	   <!-- ====================================== SWS Action Menus ======================================= -->		
+			<menuitem id="sws_registration" name="Registration" parent="sws_sub_head" sequence="1" action="action_partner_supplier_form_demo"/>
+			<menuitem id="sws_criteria_menu" name="SWS Criteria" parent="sws_sub_criteria" sequence="2" action="action_sws_criteria_tree_view"/> 
+			<menuitem id="sws_scholar_criteria_menu" name="SWS Scholarship Criteria" parent="sws_sub_scholarship" sequence="3" action="action_sws_scholar_criteria_tree_view"/>
+			<menuitem id="sws_scholar_sanction_criteria_menu" name="Scholarship Sanction Criteria" parent="sws_sub_scholarship" sequence="4" action="action_sws_scholar_sanction_criteria_tree_view"/>
+			<menuitem id="scholar_institution_menu" name="Institution Details" parent="sws_sub_scholarship" action="action_scholar_institution_tree_view"/>
+			<menuitem id="object_name_menu" name="Course Details" parent="sws_sub_scholarship" action="action_course_name_tree_view"/>
+    		<menuitem id="pensioncycle_menu" name="Pension Cycle" parent="sws_sub_head" sequence="5" action="action_pensioncycle_tree_view"/>
+    	
+    	<!-- =======================================  Registration Menus ================================================== -->	
+    		
+			<menuitem id="waqf_registration" name="Registration" parent="registration_form" sequence="1" action="action_partner_customer_form"/>
+			<menuitem id="wakf_district_menu" name="Districts" parent="registration_location" action="action_wakf_district_tree_view"/>
+            <menuitem id="wakf_taluk_menu" name="Taluks" parent="registration_location" action="action_wakf_taluk_tree_view"/>
+            <menuitem id="wakf_village_menu" name="Village" parent="registration_location" action="action_wakf_village_tree_view"/>
+			<menuitem id="wakf_immovable_property_menu" name="Immovable Property" parent="registration_other" action="action_wakf_immovable_property_tree_view"/>
+			<menuitem id="wakf_movable_property_menu" name="Movable Property" parent="registration_other" action="action_wakf_movable_property_tree_view"/>
+			<menuitem id="wakf_management_menu" name="Management Details" parent="registration_other" action="action_wakf_management_tree_view"/>
+            <menuitem id="wakf_type_menu" name="Wakf Type" parent="registration_other" action="action_wakf_type_tree_view"/>
+    		  
+    		  <!--  
+    		<record forcecreate="True" id="ir_cron_pension_fine_action" model="ir.cron">
+			  <field name="name">Run Pension Scheduler</field>
+			  <field eval="True" name="active" />
+			  <field name="user_id" ref="base.user_root" />
+			  <field name="interval_number">1</field>
+			  <field name="interval_type">minutes</field>
+			  <field name="numbercall">-1</field>
+			  <field eval="'sws.registration'" name="model" />
+			  <field eval="'action_scheduler_pension'" name="function" />
+			  <field eval="'()'" name="args" />
+			</record> 
+    
+    
+    		<record forcecreate="True" id="ir_cron_education_loan_action" model="ir.cron">
+			  <field name="name">Run Education Loan Scheduler</field>
+			  <field eval="True" name="active" />
+			  <field name="user_id" ref="base.user_root" />
+			  <field name="interval_number">1</field>
+			  <field name="interval_type">minutes</field>
+			  <field name="numbercall">-1</field>
+			  <field eval="'sws.registration'" name="model" />
+			  <field eval="'action_edu_loan_days'" name="function" />
+			  <field eval="'()'" name="args" />
+			 </record>
+    -->
+    </data>
+</openerp>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+    	 
+    	
+    	<record id="invoice_supplier_invoice_form" model="ir.ui.view">
+		  			<field name="name">view.account.invoicee.inherited</field>
+		  			<field name="model">account.invoice</field>
+		  			<field name="inherit_id" ref="account.invoice_supplier_form" />
+		  			<field name="arch" type="xml">
+		  				<xpath expr="//form/sheet/group/group[1]" position="inside">
+		  						<field name="is_sws" invisible="1"/>
+		  						<field name="appli_no"/>
+		  						<field name="head"/>
+                				
+		  				</xpath>
+		  				<xpath expr="//form/sheet/notebook/page[@string='Invoice']/div" position="replace"/>
+		  			
+		  			</field>
+		  			</record>
+			
+			<!-- ===================================================================================================== -->
+			<!-- ===================================================================================================== -->
+			
+			<record id="invoice_customer_invoice_form" model="ir.ui.view">
+  			<field name="name">view.account.invoicee.inherited</field>
+  			<field name="model">account.invoice</field>
+  			<field name="inherit_id" ref="account.invoice_form" />
+  			<field name="arch" type="xml">
+  				 
+  				 <xpath expr="//form/sheet/group/group[1]" position="replace"> 
+  			    		<group>
+  			    		<field name="registration_no" attrs="{'invisible':['|',('is_assessment', '!=', True),('is_sws', '=', True)]}" on_change="on_change_wakf_regno_to_name(registration_no)"/>
+						<field string="Name" name="partner_id" on_change="onchange_partner_id(type,partner_id,date_invoice,payment_term, partner_bank_id,company_id)" groups="base.group_user" context="{'search_default_customer':1, 'show_address': 1}"  domain="[('customer', '=', True)]"/>
+						<field name="appli_no" attrs="{'invisible':['|',('is_assessment', '=', True),('is_sws', '!=', True)]}"/>
+						<field name="fiscal_position" widget="selection" attrs="{'invisible':[('is_assessment', '=', True)]}"/>
+						<field name="is_assessment" invisible="1"/>
+						<field name="is_sws" invisible="1"/>
+				<!--  		<button name="check_report" string="Re-assessment" type="object"/>  -->
+				        </group>
+				</xpath>
+				<xpath expr="//form/sheet/group/group[1]" position="before">
+               	<group attrs="{'invisible':[('is_assessment', '!=', True)]}">
+               	    <field name="revised"/>
+               	    <field name="order_no" attrs="{'invisible':[('revised', '=', False)]}"/>
+               	    <field name="order_date" attrs="{'invisible':[('revised', '=', False)]}"/>
+               	 </group>
+               	 <group attrs="{'invisible':[('is_assessment', '!=', True)]}"></group>
+               	 </xpath>
+               
+               <xpath expr="//form/sheet/group" position="inside">
+                   <group attrs="{'invisible':[('is_assessment', '!=', True)]}">
+                   	 
+                   	 <field name ="account_year_saleorder"/>
+                   	 <field name="assess_year_saleorder"/>
+                 	 <field name="total_income_saleorder" />
+                     <field name="total_expense_saleorder"/>
+                     
+               	 </group>
+               	 <group attrs="{'invisible':[('is_assessment', '!=', True)]}">
+               	 		<field name ="assessment_type"/>
+               	    <!--  <field name="cash_hand_saleorder"/>
+               		<field name="cash_bank_saleorder"/>
+               		<field name="date_from"/>
+               		<field name="date_to"/>-->
+               	 </group>
+               </xpath>
+               <xpath expr="//form/sheet/notebook/page[@string='Other Info']/group/group[2]/field[@name='name']" position="replace">
+               		<field name="name" string="Wakf Reference"/>
+               </xpath>
+               <xpath expr="//form/sheet/notebook/page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='quantity']" position="replace">
+  					<field name="quantity" invisible="1"/>
+  				</xpath>
+                <xpath expr="//form/sheet/notebook/page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='price_unit']" position="replace">
+               		<field name="price_unit" invisible="1"/>
+  				</xpath>
+                <xpath expr="//form/sheet/notebook/page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='invoice_line_tax_id']" position="replace">  				
+  					<field name="invoice_line_tax_id" widget="many2many_tags" context="{'type':parent.type}" domain="[('parent_id','=',False),('company_id', '=', parent.company_id)]" invisible="1"/>
+  				</xpath>
+  				<xpath expr="//form/sheet/notebook/page[@string='Invoice Lines']/group/field[@name='amount_untaxed']" position="after">
+  						<field name="net_amount"/>
+  				</xpath>
+  				<xpath expr="//form/sheet/notebook/page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='account_analytic_id']" position="after">
+  				     <field name="new_amount"/>
+  				</xpath>
+  			</field>
+  		</record>
+  		
+  		<!-- #######################################  Invoice Tree Inherit ################################### -->
+  		
+  				<record id="invoice_customer_invoice_tree" model="ir.ui.view">
+	  			<field name="name">view.account.invoicee.tree.inherited</field>
+	  			<field name="model">account.invoice</field>
+	  			<field name="inherit_id" ref="account.invoice_tree" />
+	  			<field name="arch" type="xml">
+					<xpath expr="//tree[@string='Invoice']/field[@name='partner_id']" position="before">
+						 <field string="Registration No" name="registration_no"></field>
+						 <field string="Application No" name="appli_no"></field>
+					</xpath>
+					
+					<xpath expr="//tree[@string='Invoice']/field[@name='amount_untaxed']" position="replace">
+						 <field name="assessment_type"/>
+					</xpath>
+					<xpath expr="//tree[@string='Invoice']/field[@name='origin']" position="replace">
+						 <field name="net_amount"/>
+					</xpath>
+					<xpath expr="//tree[@string='Invoice']/field[@name='number']" position="replace">
+						 <field name="assess_year_saleorder"/>
+					</xpath>
+					
+				</field>
+				</record>
+
+    </data>
+</openerp>
